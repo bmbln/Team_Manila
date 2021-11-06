@@ -19,7 +19,7 @@ library(kableExtra)
 library(ggplot2)
 
 # Import data
-df <- read.csv( url( "https://raw.githubusercontent.com/bmbln/Team_Manila/main/Coding1/data/da1_datacollection.csv" ) , encoding = "UTF-8")
+df <- read.csv( url( "https://raw.githubusercontent.com/bmbln/Team_Manila/main/Coding1/assignment1/data/da1_datacollection.csv" ) , encoding = "UTF-8")
 
 ## Changing var types to binary ##
 df$sunday_open <- ifelse(df$sunday_open == 'Yes', 1, 0)
