@@ -19,119 +19,87 @@ library(kableExtra)
 library(ggplot2)
 
 # Import data
-df <- read.csv( url( "https://raw.githubusercontent.com/CheemaHaaris/Coding1/master/da1-datacollection.csv" ) )
+df <- read.csv( url( "https://raw.githubusercontent.com/bmbln/Team_Manila/main/Coding1/data/da1_datacollection.csv" ) , encoding = "UTF-8")
 
-# we only need the prices and inner/outer district variables at the moment
-df <- df %>% select( c( city , p_coke , p_snickers ) )
+## Changing var types to binary ##
+df$sunday_open <- ifelse(df$sunday_open == 'Yes', 1, 0)
+df$chain_membership <- ifelse(df$chain_membership == 'Yes',1,0) 
 
+## Inner/outer is a factor ##
+df$city <- as.factor(df$city)
 
+#we have no missing values nor duplicates, therefore no further cleaning is necessary. 
 
-bpp_orig <- bpp_orig %>% mutate( p_diff = price_online - price )
-
-bpp <- bpp_orig %>% 
-  filter( is.na(sale_online) ) %>%
-  filter(!is.na(price)) %>%
-  filter(!is.na(price_online)) %>% 
-  filter(PRICETYPE == "Regular Price") %>% 
-  filter( price < 1000 ) %>% 
-  filter( p_diff < 500 & p_diff > -500 )
+#Setting the ggplot theme
+theme_custom <- function( base_size = 11, base_family = "") {
+  theme_bw() %+replace% 
+    theme(
+      plot.background   = element_rect(fill = "grey92", colour = "grey92") ,
+      panel.grid.major  = element_line(color = "white"),
+      panel.background  = element_rect(fill = "grey92", colour = "grey92"),
+      panel.border      = element_rect(linetype = "solid", fill = NA), 
+      axis.line         = element_line(color = "black", size = 1),
+      axis.ticks        = element_line(color = "red4", size = 2),
+      axis.text         = element_text(color = "black"),
+      axis.ticks.length.y = unit(.25, "cm"),
+      axis.ticks.length.x = unit(.25, "cm"),
+      axis.text.x = element_text(margin = margin(t = .3, unit = "cm")),
+    )
+}
 
 ```
 
 ## Introduction
 
-This is a report on *The Billion Price Project*. 
+This is a report on *Coke and Snickers price differences*. 
 
 HERE COMES THE MOTIVATION WHY THIS IS A MEANINGFUL PROJECT AND WHAT IS THE MAIN GOAL!
 
-For more details on the project see: <http://www.thebillionpricesproject.com/>.
 
 ## Data
 
 HERE COMES A DETAILLED EXPLANATION ABOUT WHERE THE DATA COMES FROM AND IF IT IS REPRESENTATIVE OR NOT.
 
-Our main interest is whether online prices are lower or higher than simple retail store prices. We investigated the data on the collected prices and we have the following descriptive statistics on online, in-store prices and in their differences.
+Our main interest is whether prices are higher in the inner than in the outer districts. We investigated the data on the collected prices and we have the following descriptive statistics on Snickers and Coke prices in inner and outer districts.
 
 ```{r, echo=FALSE}
 P95 <- function(x){quantile(x,0.95,na.rm=T)}
 P05 <- function(x){quantile(x,0.05,na.rm=T)}
-datasummary( (`Retail` = price ) + (`Online` = price_online ) + (`Price difference` = p_diff ) ~
-             Mean + Median + SD + Min + Max + P05 + P95 , 
-             data = bpp ,
-             title = 'Descriptive statistics of prices',
-             notes = 'Data are available from: https://osf.io/yhbr5/' ) %>% 
+Range <- function(x){max(x,na.rm=T)-min(x,na.rm=T)}
+
+
+datasummary( (`Coke price` = p_coke )*(` ` = city) + (`Snickers price` = p_snickers )*(` ` = city)  ~
+             Mean + Median + SD + Min + Max + Range + P05 + P95 + N , 
+             data = df ,
+             title = 'Descriptive statistics of Coke and Snickers prices' ) %>% 
   kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
-The number of observations is `r sum(!is.na(bpp$price))` for all of our key variables.
 
 DESCRIPTION OF THE SUMMARY STATS: WHAT CAN WE LEARN FROM THEM?
 
-As the focus is the price difference, the next Figure shows the histogram for this variable.
+As the focus is XXXX the next Figure shows the histogram XXXXX.
 
 ```{r, echo=FALSE, warning=FALSE, fig.width=4, fig.height = 3, fig.align="center" }
-ggplot( data = bpp ) +
-  geom_density( aes( x = p_diff ) , fill = 'navyblue'  , bins = 30 ) +
-  labs(x = "Price differences",
-       y = "Relative Frequency" ) +
-  xlim(-4,4) +
-  theme_bw()
+
+ggplot( df , aes( x = p_coke ) ) +
+  geom_density( aes( y = ..density.. * 100 )) +
+  labs( title = 'Inner vs Outer district distribution of the price of coke' , x = 'Price of Coke (500ml)' , y = 'Relative Frequency (%) ') +
+  facet_wrap(df$city) +
+  theme_custom()
+
+ggplot( df , aes( x = p_snickers ) ) +
+  geom_density( aes( y = ..density.. * 100 )) +
+  labs( title = 'Inner vs Outer district distribution of the price of Snickers' , x = 'Price of Snickers' , y = 'Relative Frequency (%) ') +
+  facet_wrap(df$city) +
+  theme_custom()
+
 ```
 
 DESCRIPTION OF THE FIGURE. WHAT DOES IT TELS US?
 
 (May change the order of descriptive stats and graph.)
 
-## Testing Price Differences
-
-
-```{r, echo = FALSE }
-
-test_out <- t.test( bpp$p_diff , mu = 0 )
-
-```
-
-We test the hypothesis, whether the price difference is zero, therefore there is no difference between retail and onlin prices:
-
-$$H_0:=\text{price online} - \text{price retail} = 0$$
-$$H_A:=\text{price online} - \text{price retail} \neq 0$$
-Running a two-sided t-test, we have the t-statistic as `r round( test_out$statistic , 2 )` and the p-value as `r round( test_out$p.value , 2 )`. The 95% confidence intervals are: `r round( test_out$conf.int[1] , 2 )` and `r round( test_out$conf.int[2] , 2 )`. Based on these results with 95% confidence we can reject the hypothesis that the two price would be the same in this particular sample.
-
-
-## Robustness check / 'Heterogeneity analysis'
-
-Task: calculate and report t-tests for each countries. 
-
-You should report: Country, mean of p_diff, se of the mean for p_diff, number of observations in each country, t-statistic, p-value.
-
-Hint: use 'kable()' and to hold the table position you can define the following argument: 'position = "H"' . Take care of caption, number of digits you use and the name of variables you report! You may check how the output changes if you use 'booktabs = TRUE' input for kable!
-
-```{r, echo = FALSE }
-
-bpp$country <- factor( bpp$COUNTRY )
-# Multiple hypothesis testing
-testing <- bpp %>% 
-  select( country , p_diff ) %>% 
-  group_by( country ) %>% 
-  summarise( mean_pdiff = mean( p_diff ) ,
-             se_pdiff = 1/sqrt(n())*sd(p_diff),
-             num_obs = n() )
-
-# Testing in R is easy if one understands the theory!
-testing <- mutate( testing , t_stat = mean_pdiff / se_pdiff )
-testing <- mutate( testing , p_val = pt( -abs( t_stat ) , df = num_obs - 1 ) )
-testing <- mutate( testing ,  p_val = round( p_val , digit = 4 ) )
-
-kable( testing , digits = 4, 
-       caption = 'Online and retail price differences by countries and t-tests',
-       col.names = c('Country','Mean','SE of the Mean','Num.Obs','t-stat','p-val'),
-       "latex", booktabs = TRUE,  position = "H")
-
-```
-
-Extra: In words, select those countries, where you can not reject the alternative that the prices are different. With the command '\textcolor{red}{this is red} you can highlight these countries!
-
-Countries, where we can not reject the alternative with 95% confidence (or with 5% significance level), that the prices are different, hence retail and online prices might differ: \textcolor{red}{`r testing$country[ testing$p_val < 0.05]`}
 
 ## Conclusion
 
