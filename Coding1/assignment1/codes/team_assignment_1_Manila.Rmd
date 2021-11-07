@@ -137,9 +137,9 @@ ggplot( df , aes( x = p_snickers , group = city ) ) +
 
 ```
 
-Coke: Price for Coke in both inner and outer cites has a same range of 90-91 huf, spreading from 259 to 350 huf and from 229 to 319 huf respectively. The standard deviation for both inner and outer city is around 27-29. The averages for Coke price in inner city are a little over 300 huf, while for outer city it's around 270 huf.
+Coke: Price for Coke in both inner and outer cites is distributed in the range of 90 huf, while the averages, maximum and minimum values are 30 huf more in outer city than in inner city. The standard deviation for both inner and outer cities is approximately the same, around 27-29 huf. 
 
-Snickers: Price for Snickers in both inner and outer city has a same range of 79-80 huf, spreading from 120 to 200 huf in both. The standard deviation for inner city is around 26 and for outer city it is around 33. The averages for Snickers price in inner city are 180-190 huf, while for outer city it's around 170 huf.
+Snickers: Price for Snickers in both inner and outer city is distributed in the range of 80 huf, spreading from 120 to 200 huf in both. The standard deviation for inner city is around 26 and for outer city it is around 33. The averages for Snickers price in inner city are 180-190 huf, while for outer city it's around 170 huf.  
 
 
 
