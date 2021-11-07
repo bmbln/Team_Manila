@@ -7,9 +7,6 @@ output:
 
 
 ```{r setup, include=FALSE}
-#knitr::opts_chunk$set(fig.pos = "!H", out.extra = "")
-# Set graph size
-#knitr::opts_chunk$set(echo = FALSE, out.width = "50%" )#fig.asp = 0.5, fig.width = 7, out.width = "90%" )
 
 rm(list = ls())
 
@@ -31,19 +28,25 @@ df$city <- as.factor(df$city)
 #we have no missing values nor duplicates, therefore no further cleaning is necessary. 
 
 #Setting the ggplot theme
-theme_custom <- function( base_size = 11, base_family = "") {
+theme_custom <- function( base_size = 10, base_family = "") {
   theme_bw() %+replace% 
     theme(
-      plot.background   = element_rect(fill = "grey92", colour = "grey92") ,
-      panel.grid.major  = element_line(color = "white"),
-      panel.background  = element_rect(fill = "grey92", colour = "grey92"),
-      panel.border      = element_rect(linetype = "solid", fill = NA), 
-      axis.line         = element_line(color = "black", size = 1),
-      axis.ticks        = element_line(color = "red4", size = 2),
-      axis.text         = element_text(color = "black"),
-      axis.ticks.length.y = unit(.25, "cm"),
-      axis.ticks.length.x = unit(.25, "cm"),
-      axis.text.x = element_text(margin = margin(t = .3, unit = "cm")),
+      plot.background   = element_rect( fill = "grey92" , colour = "grey92" ) ,
+      panel.grid.major  = element_line( color = "white" ),
+      panel.background  = element_rect( fill = "grey92", colour = "grey92" ),
+      panel.border      = element_rect( linetype = "solid" , fill = NA ), 
+      axis.line         = element_line( color = "black" , size = 1 ),
+      axis.ticks        = element_line( color = "red4" , size = 2 ),
+      axis.text         = element_text( color = "black" , size = base_size*0.9 ),
+      axis.ticks.length.y = unit( .25, "cm"),
+      axis.ticks.length.x = unit( .25, "cm"),
+      axis.title = element_text( size = base_size*0.9 ),
+      legend.text = element_text( size = base_size*0.7 ),
+      legend.title = element_text( size = base_size*0.8 ),
+      legend.key.size = unit( .4, "cm"),
+      legend.position = 'top',
+      legend.justification= 'left',
+      legend.direction= 'horizontal'
     )
 }
 
@@ -80,18 +83,28 @@ DESCRIPTION OF THE SUMMARY STATS: WHAT CAN WE LEARN FROM THEM?
 
 As the focus is XXXX the next Figure shows the histogram XXXXX.
 
-```{r, echo=FALSE, warning=FALSE, fig.width=4, fig.height = 3, fig.align="center" }
+```{r, echo=FALSE, warning=FALSE, fig.width=3, fig.height = 3, fig.align="center" , fig.show="hold" , figures-side , out.width="50%" }
 
-ggplot( df , aes( x = p_coke ) ) +
-  geom_density( aes( y = ..density.. * 100 )) +
-  labs( title = 'Inner vs Outer district distribution of the price of coke' , x = 'Price of Coke (500ml)' , y = 'Relative Frequency (%) ') +
-  facet_wrap(df$city) +
+ggplot( df , aes( x = p_coke , group = city ) ) +
+  geom_density( aes( y = ..density.. * 100  , fill = city ) , alpha = 0.3  ) +
+  labs( title = 'Coke prices' , 
+        subtitle = 'in the 14th and 7th districts' ,
+        x = 'Price of Coke (500ml)' , 
+        y = 'Relative Frequency (%)'
+        ) +
+  scale_fill_discrete( name = 'Districts:' ) + 
+  xlim(0,400) + 
   theme_custom()
 
-ggplot( df , aes( x = p_snickers ) ) +
-  geom_density( aes( y = ..density.. * 100 )) +
-  labs( title = 'Inner vs Outer district distribution of the price of Snickers' , x = 'Price of Snickers' , y = 'Relative Frequency (%) ') +
-  facet_wrap(df$city) +
+ggplot( df , aes( x = p_snickers , group = city ) ) +
+  geom_density( aes( y = ..density.. * 100  , fill = city ) , alpha = 0.3  ) +
+  labs( title = 'Snickers prices' , 
+        subtitle = 'in the 14th and 7th districts' ,
+        x = 'Price of Snickers' , 
+        y = 'Relative Frequency (%)'
+        ) +
+  scale_fill_discrete( name = 'Districts:') + 
+  xlim(0,400) + 
   theme_custom()
 
 ```
