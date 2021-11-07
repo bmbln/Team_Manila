@@ -22,6 +22,24 @@ df <- read.csv( url( "https://raw.githubusercontent.com/bmbln/Team_Manila/main/C
 df$sunday_open <- ifelse(df$sunday_open == 'Yes', 1, 0)
 df$chain_membership <- ifelse(df$chain_membership == 'Yes',1,0) 
 
+## Calculate opening hours, add column with opening hours variable and remove columns with opening&closing time ##
+# add seconds
+df$ot <- gsub(' ','', paste(df$ot,":00"))
+df$ct <- gsub(' ','', paste(df$ct,":00"))
+
+#convert column to date format
+df$ot_new <- strptime(df$ot, format = '%H:%M:%S')
+df$ct_new <- strptime(df$ct, format = '%H:%M:%S')
+
+#calculate opening hours
+df$openinghours <- abs(difftime(df$ct_new,df$ot_new, units = 'hours'))
+df$openinghours <- gsub(' hours','',df$openinghours)
+df$openinghours <- ifelse(df$openinghours == '0', '24', df$openinghours)
+
+#filter out ot,ct,ot_new and ct_new columns
+df <- df %>% select( !c( ot_new, ct_new ) )
+df <- df %>% select( !c( ot, ct ) )
+
 ## Inner/outer is a factor ##
 df$city <- as.factor(df$city)
 
@@ -56,14 +74,24 @@ theme_custom <- function( base_size = 10, base_family = "") {
 
 This is a report on *Coke and Snickers price differences*. 
 
-HERE COMES THE MOTIVATION WHY THIS IS A MEANINGFUL PROJECT AND WHAT IS THE MAIN GOAL!
+The motivation of our analysis is to summarize and organize main characteristics of our Coke and Snickers [dataset](https://github.com/bmbln/Team_Manila/blob/main/Coding1/assignment1/data/da1_datacollection.csv). Our descriptive statistics include measures of central tendency, that are means and medians, in order to provide with an averages of prices of products mainly for two different districts, where one is in inner city and another is in outer city. It also includes measures of variability of prices, that are standard deviations, range, quartiles, minimum and maximum values of prices of selected products, in order to describe how the data is distributed within the dataset. For these two measures we used tables and density plots for  better understanding the meaning of our analyzed data.
 
 
 ## Data
 
-HERE COMES A DETAILLED EXPLANATION ABOUT WHERE THE DATA COMES FROM AND IF IT IS REPRESENTATIVE OR NOT.
+The data was collected by using simple random sampling, mainly randomly dropping pins on Google Maps in two selected districts (where one is in the "inner city" and another is in the "outer city"). We chose random direction and walked until we bump into a store to collect prices of Snickers and Coke.
+Short description of each variable:
+1)	prices for two products, that are Coke and Snickers (integer);
+2)	name of randomly selected shop (character);
+3)	unique ID for the shop, as there are duplicated shop names on different addresses (integer);
+4)	city where the shop is located, that are outer or inner cities (character);
+5)	district, where one was selected from inner city and another is from outer city (character); 
+6)	number of cashiers, implicitly measuring the store size (integer); 
+7)	open on Sundays or not (binary variable);
+8)	membership in a store chain, that brings in economics of scale (binary variable)
+9)	opening hours, that were calculated from closing hours less opening hours (integer). 
 
-Our main interest is whether prices are higher in the inner than in the outer districts. We investigated the data on the collected prices and we have the following descriptive statistics on Snickers and Coke prices in inner and outer districts.
+We investigated the data on the collected prices and we have the following descriptive statistics on Snickers and Coke prices in inner and outer districts.
 
 ```{r, echo=FALSE}
 P95 <- function(x){quantile(x,0.95,na.rm=T)}
@@ -81,7 +109,7 @@ datasummary( (`Coke price` = p_coke )*(` ` = city) + (`Snickers price` = p_snick
 
 DESCRIPTION OF THE SUMMARY STATS: WHAT CAN WE LEARN FROM THEM?
 
-As the focus is XXXX the next Figure shows the histogram XXXXX.
+As the focus is to organize the main characteristics of data and measure the averages and variability of prices of two products in two types of city separately, the next Figure shows the density plots for prices of Coke and Snickers in inner city and outer city.
 
 ```{r, echo=FALSE, warning=FALSE, fig.width=3, fig.height = 3, fig.align="center" , fig.show="hold" , figures-side , out.width="50%" }
 
@@ -109,11 +137,13 @@ ggplot( df , aes( x = p_snickers , group = city ) ) +
 
 ```
 
-DESCRIPTION OF THE FIGURE. WHAT DOES IT TELS US?
+Coke: Price for Coke in both inner and outer cites has a same range of 90-91 huf, spreading from 259 to 350 huf and from 229 to 319 huf respectively. The standard deviation for both inner and outer city is around 27-29. The averages for Coke price in inner city are a little over 300 huf, while for outer city it's around 270 huf.
 
-(May change the order of descriptive stats and graph.)
+Snickers: Price for Snickers in both inner and outer city has a same range of 79-80 huf, spreading from 120 to 200 huf in both. The standard deviation for inner city is around 26 and for outer city it is around 33. The averages for Snickers price in inner city are 180-190 huf, while for outer city it's around 170 huf.
+
+
 
 
 ## Conclusion
 
-HERE COMES WHAT WE HAVE LEARNED AND WHAT WOULD STRENGHTEN AND WEAKEN OUR ANALYSIS.
+From this exercise we learned how to do perform descriptive analysis in proper order, that is we organized the dataset, by cleaning and filtering it, decided which descriptive statistics to use and which graphs to build in order to better describe main characteristics of our set of data. 
