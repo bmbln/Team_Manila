@@ -107,8 +107,6 @@ datasummary( (`Coke price` = p_coke )*(` ` = city) + (`Snickers price` = p_snick
 ```
 
 
-DESCRIPTION OF THE SUMMARY STATS: WHAT CAN WE LEARN FROM THEM?
-
 As the focus is to organize the main characteristics of data and measure the averages and variability of prices of two products in two types of city separately, the next Figure shows the density plots for prices of Coke and Snickers in inner city and outer city.
 
 ```{r, echo=FALSE, warning=FALSE, fig.width=3, fig.height = 3, fig.align="center" , fig.show="hold" , figures-side , out.width="50%" }
