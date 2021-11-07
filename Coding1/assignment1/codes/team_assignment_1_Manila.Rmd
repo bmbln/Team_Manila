@@ -15,6 +15,55 @@ library(modelsummary)
 library(kableExtra)
 library(ggplot2)
 
+#Setting the ggplot theme
+theme_custom <- function( base_size = 10, base_family = "") {
+  theme_bw() %+replace% 
+    theme(
+      plot.background   = element_rect( fill = "grey92" , colour = "grey92" ) ,
+      panel.grid.major  = element_line( color = "white" ),
+      panel.background  = element_rect( fill = "grey92", colour = "grey92" ),
+      panel.border      = element_rect( linetype = "solid" , fill = NA ), 
+      axis.line         = element_line( color = "black" , size = 1 ),
+      axis.ticks        = element_line( color = "red4" , size = 2 ),
+      axis.text         = element_text( color = "black" , size = base_size*0.9 ),
+      axis.ticks.length.y = unit( .25, "cm"),
+      axis.ticks.length.x = unit( .25, "cm"),
+      axis.title = element_text( size = base_size*0.9 ),
+      legend.text = element_text( size = base_size*0.7 ),
+      legend.title = element_text( size = base_size*0.8 ),
+      legend.key.size = unit( .4, "cm"),
+      legend.position = 'top',
+      legend.justification= 'left',
+      legend.direction= 'horizontal'
+    )
+}
+
+```
+
+## Introduction  
+
+This is a report on *Coke and Snickers price differences*.  
+
+The motivation of our analysis is to summarize and organize main characteristics of our Coke and Snickers [dataset](https://github.com/bmbln/Team_Manila/blob/main/Coding1/assignment1/data/da1_datacollection.csv). Our descriptive statistics include measures of central tendency, that are means and medians, conditional on city part (inner or outer district). It also includes measures of variability of prices, that are standard deviations, range, quartiles, minimum and maximum values of prices of selected products conditional on districts, in order to describe how the prices are distributed within the dataset. For the price variables, we used tables and density plots for better understanding the meaning of our analyzed data.  
+
+
+## Data  
+
+The data was collected by using random sampling. We randomly dropped a few pins on Google Maps in two selected districts (where one is in the "inner city" and another is in the "outer city"). We chose a random direction and walked until we bumped into a store to collect prices of Snickers and Coke.  
+Short description of each variable:  
+
+1. *price*s for two products, that are Coke and Snickers (integer);  
+2. *name* of randomly selected shop (character);  
+3. unique *ID* for the shop, as there are duplicated shop names on different addresses (integer);  
+4. *city* part where the shop is located, that are outer or inner cities (character);  
+5. *district*, where one was selected from inner city and another is from outer city (character);  
+6. *number of cashiers*, implicitly measuring the store size (integer);  
+7. *open on Sundays* or not (binary variable);  
+8. *membership in a store chain*, that brings in economics of scale (binary variable);    
+9. *opening hours*, that were calculated from closing hours minus opening hours (integer). 
+
+```{r echo=FALSE, warning=FALSE}
+
 # Import data
 df <- read.csv( url( "https://raw.githubusercontent.com/bmbln/Team_Manila/main/Coding1/assignment1/data/da1_datacollection.csv" ) , encoding = "UTF-8")
 
@@ -45,55 +94,14 @@ df$city <- as.factor(df$city)
 
 #we have no missing values nor duplicates, therefore no further cleaning is necessary. 
 
-#Setting the ggplot theme
-theme_custom <- function( base_size = 10, base_family = "") {
-  theme_bw() %+replace% 
-    theme(
-      plot.background   = element_rect( fill = "grey92" , colour = "grey92" ) ,
-      panel.grid.major  = element_line( color = "white" ),
-      panel.background  = element_rect( fill = "grey92", colour = "grey92" ),
-      panel.border      = element_rect( linetype = "solid" , fill = NA ), 
-      axis.line         = element_line( color = "black" , size = 1 ),
-      axis.ticks        = element_line( color = "red4" , size = 2 ),
-      axis.text         = element_text( color = "black" , size = base_size*0.9 ),
-      axis.ticks.length.y = unit( .25, "cm"),
-      axis.ticks.length.x = unit( .25, "cm"),
-      axis.title = element_text( size = base_size*0.9 ),
-      legend.text = element_text( size = base_size*0.7 ),
-      legend.title = element_text( size = base_size*0.8 ),
-      legend.key.size = unit( .4, "cm"),
-      legend.position = 'top',
-      legend.justification= 'left',
-      legend.direction= 'horizontal'
-    )
-}
-
 ```
+During the data preparation, we cleaned and re-calculated some of our variables for further analysis. In this short report we only concentrate on price differences among city parts, so most of the variables aren't used.   
 
-## Introduction
+## Descriptive statistics
 
-This is a report on *Coke and Snickers price differences*. 
+We investigated the data on the collected prices and we have the following descriptive statistics on Snickers and Coke prices in inner and outer districts.  
 
-The motivation of our analysis is to summarize and organize main characteristics of our Coke and Snickers [dataset](https://github.com/bmbln/Team_Manila/blob/main/Coding1/assignment1/data/da1_datacollection.csv). Our descriptive statistics include measures of central tendency, that are means and medians, in order to provide with an averages of prices of products mainly for two different districts, where one is in inner city and another is in outer city. It also includes measures of variability of prices, that are standard deviations, range, quartiles, minimum and maximum values of prices of selected products, in order to describe how the data is distributed within the dataset. For these two measures we used tables and density plots for  better understanding the meaning of our analyzed data.
-
-
-## Data
-
-The data was collected by using simple random sampling, mainly randomly dropping pins on Google Maps in two selected districts (where one is in the "inner city" and another is in the "outer city"). We chose random direction and walked until we bump into a store to collect prices of Snickers and Coke.
-Short description of each variable:
-1)	prices for two products, that are Coke and Snickers (integer);
-2)	name of randomly selected shop (character);
-3)	unique ID for the shop, as there are duplicated shop names on different addresses (integer);
-4)	city where the shop is located, that are outer or inner cities (character);
-5)	district, where one was selected from inner city and another is from outer city (character); 
-6)	number of cashiers, implicitly measuring the store size (integer); 
-7)	open on Sundays or not (binary variable);
-8)	membership in a store chain, that brings in economics of scale (binary variable)
-9)	opening hours, that were calculated from closing hours less opening hours (integer). 
-
-We investigated the data on the collected prices and we have the following descriptive statistics on Snickers and Coke prices in inner and outer districts.
-
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE}
 P95 <- function(x){quantile(x,0.95,na.rm=T)}
 P05 <- function(x){quantile(x,0.05,na.rm=T)}
 Range <- function(x){max(x,na.rm=T)-min(x,na.rm=T)}
@@ -106,8 +114,13 @@ datasummary( (`Coke price` = p_coke )*(` ` = city) + (`Snickers price` = p_snick
   kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
+Coke: Price for Coke in both inner and outer cites is distributed in the range of 90 HUF, while the averages, maximum and minimum values are 30 HUF more in outer city than in inner city. The standard deviation for both inner and outer cities is approximately the same, around 27-29 HUF.   
 
-As the focus is to organize the main characteristics of data and measure the averages and variability of prices of two products in two types of city separately, the next Figure shows the density plots for prices of Coke and Snickers in inner city and outer city.
+Snickers: Price for Snickers in both inner and outer city is distributed in the range of 80 HUF, spreading from 120 to 200 HUF in both. The standard deviation for inner city is around 26 and for outer city it is around 33. The averages for Snickers price in inner city are 180-190 HUF, while for outer city it's around 170 HUF.  
+
+The next Figure shows the density plots for prices of Coke and Snickers in inner city and outer city.  
+
+We choose kernel density plots to display price differences, because it allows us to compare conditional distributions on the same chart. The X axis was defined in a way that the 2 products can be compared next to each other.  
 
 ```{r, echo=FALSE, warning=FALSE, fig.width=3, fig.height = 3, fig.align="center" , fig.show="hold" , figures-side , out.width="50%" }
 
@@ -134,12 +147,6 @@ ggplot( df , aes( x = p_snickers , group = city ) ) +
   theme_custom()
 
 ```
-
-Coke: Price for Coke in both inner and outer cites is distributed in the range of 90 huf, while the averages, maximum and minimum values are 30 huf more in outer city than in inner city. The standard deviation for both inner and outer cities is approximately the same, around 27-29 huf. 
-
-Snickers: Price for Snickers in both inner and outer city is distributed in the range of 80 huf, spreading from 120 to 200 huf in both. The standard deviation for inner city is around 26 and for outer city it is around 33. The averages for Snickers price in inner city are 180-190 huf, while for outer city it's around 170 huf.  
-
-
 
 
 ## Conclusion
